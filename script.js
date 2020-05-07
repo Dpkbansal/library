@@ -27,16 +27,30 @@ let myLibrary = [];
                         myLibrary.push(newBook);
                     }
                 }
+           
+           render();
                 
-           db.collection("books").add(newBook)
-                .then(function(docRef) {
-                    console.log("Document written with ID: ", docRef.id);
-                })
-                .catch(function(error) {
-                    console.error("Error adding document: ", error);
-                });
-            render();
+                db.collection("books").add(newBook).then(() => {
+                console.log("book added");
+            }).catch(err => {
+                console.log("error");
+            })
+});
         }
+
+        db.collection("books").onSnapshot(snapshot => {
+            snapshot.docChanges().forEach(change => {
+                const doc = change.doc;
+                if(change.type === "added") {
+                    console.log("add")
+                    addBook(doc.data(), doc.id);
+                }
+                else if(change.type === "removed") {
+                    deleteBook(doc.id);
+
+                }
+            })
+        });
 
         function render(){
             
